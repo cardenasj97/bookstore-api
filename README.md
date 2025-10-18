@@ -1,63 +1,114 @@
-# Week 1 – Bookstore API (PostgreSQL + Prisma + Express + Zod)
+# Bookstore API
 
-A clean, production-ready starter to practice DB modeling, migrations, validation, pagination, and basic CRUD.
+A REST API for managing books, authors, and categories with full CRUD operations, pagination, and search capabilities.
 
-## Stack
-- Node 18+, TypeScript, Express
-- PostgreSQL + Prisma
-- Zod validation
-- Docker Compose for local DB
+## Tech Stack
 
-## Getting Started
+- **Runtime:** Node.js 18+ with TypeScript
+- **Framework:** Express.js
+- **Database:** PostgreSQL with Prisma ORM
+- **Validation:** Zod schemas
+- **Testing:** Jest + Supertest
+- **Logging:** Pino with structured request logging
+- **Dev Tools:** Docker Compose for local PostgreSQL
 
-1) Copy `.env.example` to `.env` and adjust if needed.
+## Features
+
+- ✅ CRUD operations for Books, Authors, and Categories
+- ✅ Many-to-many relationships (Books ↔ Authors, Books ↔ Categories)
+- ✅ Pagination and search on all list endpoints
+- ✅ Request validation with Zod
+- ✅ Structured logging with request IDs
+- ✅ Full test coverage with Jest
+- ✅ Type-safe database queries with Prisma
+
+## Quick Start
+
+### Prerequisites
+- Node.js 18+
+- Docker & Docker Compose (for PostgreSQL)
+
+### Installation
+
+1. **Install dependencies:**
+```bash
+npm install
 ```
+
+2. **Set up environment:**
+```bash
 cp .env.example .env
 ```
 
-2) Start Postgres:
-```
+3. **Start PostgreSQL:**
+```bash
 docker compose up -d
 ```
 
-3) Install deps:
-```
-pnpm i   # or npm i / yarn
-```
-
-4) Generate Prisma client & run migrations:
-```
-pnpm prisma:generate
-pnpm prisma:migrate
+4. **Run migrations:**
+```bash
+npm run prisma:generate
+npm run prisma:migrate
 ```
 
-5) Start the API in dev mode:
-```
-pnpm dev
+5. **Seed database (optional):**
+```bash
+npm run prisma:seed
 ```
 
-- Health check: `GET http://localhost:3000/health`
+6. **Start development server:**
+```bash
+npm run dev
+```
 
-## Endpoints
+API will be available at `http://localhost:3000`
+
+## API Endpoints
+
+### Health Check
+```
+GET /health
+```
 
 ### Authors
-- `POST /authors` – create `{ name, bio? }`
-- `GET /authors?page=1&pageSize=10&search=doe`
-
-### Categories
-- `POST /categories` – create `{ name }`
-- `GET /categories?page=1&pageSize=10&search=sci`
-
-### Books
-- `POST /books` – create `{ title, description?, publishedAt?, authorIds?: number[], categoryIds?: number[] }`
-- `GET /books?page=1&pageSize=10&search=algorithms&authorId=1&categoryId=2`
-
-All list endpoints return:
-```json
-{ "items": [...], "page": 1, "pageSize": 10, "total": 42 }
+```
+POST   /authors                    # Create author
+GET    /authors                    # List authors (paginated)
+GET    /authors/:id                # Get author by ID
+PUT    /authors/:id                # Update author
+DELETE /authors/:id                # Delete author
 ```
 
-## Notes
-- Uses Prisma implicit many-to-many relations for `Book <-> Author` and `Book <-> Category`.
-- Validation via `zod` in a simple `validate` middleware.
-- Add tests with Jest + Supertest as a stretch goal.
+### Categories
+```
+POST   /categories                 # Create category
+GET    /categories                 # List categories (paginated)
+GET    /categories/:id             # Get category by ID
+PUT    /categories/:id             # Update category
+DELETE /categories/:id             # Delete category
+```
+
+### Books
+```
+POST   /books                      # Create book
+GET    /books                      # List books (paginated, filterable)
+GET    /books/:id                  # Get book by ID
+PUT    /books/:id                  # Update book
+DELETE /books/:id                  # Delete book
+```
+
+## Project Structure
+
+```
+src/
+├── __tests__/          # Test files
+├── controllers/        # Route handlers
+├── lib/                # Shared utilities (logger, prisma)
+├── middleware/         # Express middleware
+├── routes/             # Route definitions
+├── schemas/            # Zod validation schemas
+├── types/              # TypeScript type definitions
+├── utils/              # Helper functions
+├── app.ts              # Express app setup
+└── server.ts           # Server entry point
+```
