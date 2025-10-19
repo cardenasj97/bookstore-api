@@ -1,4 +1,7 @@
 node_modules
-coverage
+dist
 .env
+*.log
+coverage
+.test-db-state.json
 .DS_Store

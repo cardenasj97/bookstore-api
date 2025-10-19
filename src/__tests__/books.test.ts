@@ -99,7 +99,7 @@ describe("Books API", () => {
         authorIds: [99999],
       });
 
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(404);
     });
 
     test("should fail when categoryIds contains invalid category", async () => {
@@ -108,7 +108,7 @@ describe("Books API", () => {
         categoryIds: [99999],
       });
 
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(404);
     });
   });
 
@@ -311,6 +311,12 @@ describe("Books API", () => {
       expect(response.body.items[1].id).toBe(book2.id);
       expect(response.body.items[2].id).toBe(book1.id);
     });
+
+    test("should limit pageSize to maximum 100", async () => {
+      const response = await request(app).get("/books?pageSize=200");
+      
+      expect(response.status).toBe(400);
+    });
   });
 
   describe("PUT /books/:id", () => {
@@ -376,7 +382,7 @@ describe("Books API", () => {
         .put("/books/99999")
         .send({ title: "New Title" });
 
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(404);
     });
 
     test("should accept empty body (no updates)", async () => {
@@ -388,6 +394,71 @@ describe("Books API", () => {
 
       expect(response.status).toBe(200);
       expect(response.body.title).toBe("Test Book");
+    });
+
+    test("should update book authors", async () => {
+      const author1 = await prisma.author.create({
+        data: { name: "Author 1" },
+      });
+      const author2 = await prisma.author.create({
+        data: { name: "Author 2" },
+      });
+      const book = await prisma.book.create({
+        data: {
+          title: "Test Book",
+          authors: { connect: [{ id: author1.id }] },
+        },
+      });
+
+      const response = await request(app)
+        .put(`/books/${book.id}`)
+        .send({ authorIds: [author2.id] });
+
+      expect(response.status).toBe(200);
+      expect(response.body.authors).toHaveLength(1);
+      expect(response.body.authors[0].id).toBe(author2.id);
+    });
+
+    test("should update book categories", async () => {
+      const category1 = await prisma.category.create({
+        data: { name: "Category 1" },
+      });
+      const category2 = await prisma.category.create({
+        data: { name: "Category 2" },
+      });
+      const book = await prisma.book.create({
+        data: {
+          title: "Test Book",
+          categories: { connect: [{ id: category1.id }] },
+        },
+      });
+
+      const response = await request(app)
+        .put(`/books/${book.id}`)
+        .send({ categoryIds: [category2.id] });
+
+      expect(response.status).toBe(200);
+      expect(response.body.categories).toHaveLength(1);
+      expect(response.body.categories[0].id).toBe(category2.id);
+    });
+
+    test("should clear book authors with empty array", async () => {
+      const author = await prisma.author.create({
+        data: { name: "Author 1" },
+      });
+      const book = await prisma.book.create({
+        data: {
+          title: "Test Book",
+          authors: { connect: [{ id: author.id }] },
+        },
+      });
+
+      const response = await request(app)
+        .put(`/books/${book.id}`)
+        .send({ authorIds: [] });
+
+      expect(response.status).toBe(200);
+      expect(response.body.authors).toHaveLength(0);
     });
   });
 
@@ -411,7 +482,7 @@ describe("Books API", () => {
     test("should fail when book does not exist", async () => {
       const response = await request(app).delete("/books/99999");
 
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(404);
     });
 
     test("should delete book and remove relations", async () => {

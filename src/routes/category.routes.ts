@@ -1,9 +1,12 @@
 import { Router } from "express";
 import { validate } from "../middleware/validate.js";
-import { createCategorySchema } from "../schemas/category.js";
-import { createCategory, listCategories } from "../controllers/category.controller.js";
+import { createCategorySchema, listCategoriesSchema } from "../schemas/category.js";
+import {
+  getCategories,
+  postCategory,
+} from "../interfaces/http/category.http.js";
 
 export const categoryRouter = Router();
 
-categoryRouter.post("/", validate(createCategorySchema), createCategory);
-categoryRouter.get("/", listCategories);
+categoryRouter.post("/", validate(createCategorySchema), postCategory);
+categoryRouter.get("/", validate(listCategoriesSchema, "query"), getCategories);

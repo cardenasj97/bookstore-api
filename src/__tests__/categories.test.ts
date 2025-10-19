@@ -44,7 +44,7 @@ describe("Categories API", () => {
 
       expect(response.status).toBe(409); // Unique constraint violation
       expect(response.body).toMatchObject({
-        error: "ConflictError",
+        error: "A record with this name already exists.",
       });
     });
   });
@@ -64,7 +64,11 @@ describe("Categories API", () => {
 
     test("should return list of categories", async () => {
       await prisma.category.createMany({
-        data: [{ name: "Fantasy" }, { name: "Science Fiction" }, { name: "Mystery" }],
+        data: [
+          { name: "Fantasy" },
+          { name: "Science Fiction" },
+          { name: "Mystery" },
+        ],
       });
 
       const response = await request(app).get("/categories");
@@ -99,7 +103,11 @@ describe("Categories API", () => {
 
     test("should support search by name", async () => {
       await prisma.category.createMany({
-        data: [{ name: "Fantasy" }, { name: "Science Fiction" }, { name: "Mystery" }],
+        data: [
+          { name: "Fantasy" },
+          { name: "Science Fiction" },
+          { name: "Mystery" },
+        ],
       });
 
       const response = await request(app).get("/categories?search=fantasy");
@@ -140,9 +148,8 @@ describe("Categories API", () => {
 
     test("should limit pageSize to maximum 100", async () => {
       const response = await request(app).get("/categories?pageSize=200");
-      
+
       expect(response.status).toBe(400);
     });
   });
 });
-

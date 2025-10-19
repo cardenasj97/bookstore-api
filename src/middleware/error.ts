@@ -25,6 +25,13 @@ export function errorHandler(
         message: `A record with this ${target} already exists`,
       });
     }
+
+    if (err.code === "P2025") {
+      return res.status(404).json({
+        error: "NotFoundError",
+        message: err.meta?.cause || "Record not found",
+      });
+    }
   }
 
   const status = err.status || 500;

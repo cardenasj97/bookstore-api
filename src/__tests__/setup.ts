@@ -1,4 +1,11 @@
 import { prisma } from "../lib/prisma.js";
+import { isTestDatabaseRunning, getTestDatabaseMessage } from "../utils/test-db-check.js";
+
+// Check if test database is running before running tests
+if (!isTestDatabaseRunning()) {
+  console.error(getTestDatabaseMessage());
+  process.exit(1);
+}
 
 // Suppress console logs during tests
 beforeAll(async () => {
