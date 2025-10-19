@@ -10,5 +10,3 @@ export const listAuthorsSchema = z.object({
   pageSize: z.coerce.number().int().positive().max(100).optional(),
   search: z.string().optional(),
 });
-
-export type CreateAuthorInput = z.infer<typeof createAuthorSchema>;

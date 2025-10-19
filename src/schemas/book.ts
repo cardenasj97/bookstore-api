@@ -23,5 +23,3 @@ export const updateBookSchema = z.object({
   authorIds: z.array(z.number().int().positive()).optional(),
   categoryIds: z.array(z.number().int().positive()).optional(),
 });
-
-export type CreateBookInput = z.infer<typeof createBookSchema>;

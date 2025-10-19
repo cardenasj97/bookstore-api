@@ -10,6 +10,7 @@ import { bookRouter } from "./routes/book.routes.js";
 import { logger } from "./lib/logger.js";
 import { pinoHttp } from "pino-http";
 import { randomUUID } from "node:crypto";
+import { reportRouter } from "./routes/report.routes.js";
 
 export const app = express();
 
@@ -50,6 +51,7 @@ app.get("/health", (_req, res) => res.json({ status: "ok" }));
 app.use("/authors", authorRouter);
 app.use("/categories", categoryRouter);
 app.use("/books", bookRouter);
+app.use("/reports", reportRouter);
 
 // error handler last
 app.use(errorHandler);

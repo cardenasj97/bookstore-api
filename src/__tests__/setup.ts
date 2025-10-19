@@ -1,3 +1,6 @@
+// Set DATABASE_URL before importing prisma
+process.env.DATABASE_URL = "postgresql://postgres:postgres@localhost:5433/bookstore_test";
+
 import { prisma } from "../lib/prisma.js";
 import { isTestDatabaseRunning, getTestDatabaseMessage } from "../utils/test-db-check.js";
 
@@ -24,6 +27,12 @@ afterAll(async () => {
   await prisma.author.deleteMany({});
   await prisma.category.deleteMany({});
   await prisma.$disconnect();
+  
+  // Close Redis and BullMQ connections
+  const { redis } = await import("../lib/redis.js");
+  const { reportQueue } = await import("../infra/queues/bullmq.js");
+  await reportQueue.close();
+  await redis.quit();
 });
 
 beforeEach(async () => {
